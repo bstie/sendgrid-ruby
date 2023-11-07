@@ -33,8 +33,16 @@ class BaseInterface
 
     @request_headers = @request_headers.merge(request_headers) if request_headers
     @http_options = http_options
+
+    # use proxy_options if the env var http_proxy is set
+    if !ENV['http_proxy'].nil? && ENV['http_proxy'] != ''
+      proxy_host, proxy_port = ENV['http_proxy'].split(':')
+      @proxy_options = { host: proxy_host, port: proxy_port.to_i }
+    end
+
     @client = SendGrid::Client.new(host: "#{@host}/#{@version}",
                                    request_headers: @request_headers,
-                                   http_options: @http_options)
+                                   http_options: @http_options,
+                                   proxy_options: @proxy_options)
   end
 end
